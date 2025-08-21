@@ -1,0 +1,20 @@
+### show user info
+GET http://localhost:4000/user/show-user
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtc2hsb29sMzhAZ21haWwuY29tIiwicm9sZSI6Imluc3RydWN0b3IiLCJmdWxsTmFtZSI6Im1vaGFtYWQiLCJpYXQiOjE3NTU1OTUyMjMsImV4cCI6MTc1NTYzMTIyM30.DnpknT5zQkf2rns_rE8KQgR9I0LgoAOooGw2OydMVjY
+
+### update user info
+PATCH http://localhost:4000/user/update-user-info
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtc2hsb29sMzhAZ21haWwuY29tIiwicm9sZSI6Imluc3RydWN0b3IiLCJmdWxsTmFtZSI6Im1vaGFtYWQiLCJpYXQiOjE3NTU1OTUyMjMsImV4cCI6MTc1NTYzMTIyM30.DnpknT5zQkf2rns_rE8KQgR9I0LgoAOooGw2OydMVjY
+
+{
+  "fullName":"mohamad",
+  "bio":"new day new me"
+}
+
+### update user info
+PATCH http://localhost:4000/user/become-instructor
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtc2hsb29sMzhAZ21haWwuY29tIiwicm9sZSI6Imluc3RydWN0b3IiLCJmdWxsTmFtZSI6Im1vaGFtYWQiLCJpYXQiOjE3NTU1OTUyMjMsImV4cCI6MTc1NTYzMTIyM30.DnpknT5zQkf2rns_rE8KQgR9I0LgoAOooGw2OydMVjY
+
