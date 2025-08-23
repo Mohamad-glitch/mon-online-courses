@@ -13,6 +13,10 @@ public class TestController {
         return "create-course";
     }
 
+    @GetMapping("/show-image")
+    public String showImage() {
+        return "show-course-image";
+    }
 
 
 }

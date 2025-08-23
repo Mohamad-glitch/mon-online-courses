@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Instructor Courses</title>
+  <style>
+    .course {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+    .course img {
+      max-width: 150px;
+      margin-right: 20px;
+      height: auto;
+      border-radius: 5px;
+    }
+    .course-details {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+<h1>My Courses</h1>
+<div id="coursesContainer"></div>
+
+<script>
+  const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtc2hsb29sMzhAZ21haWwuY29tIiwicm9sZSI6Imluc3RydWN0b3IiLCJmdWxsTmFtZSI6Im1vaGFtYWQiLCJpYXQiOjE3NTU5NTcxODgsImV4cCI6MTc1NTk5MzE4OH0.k15l-9PH76r2Md07cVWQq_nL9g9Rd8ObeBLS58d2pIU"; // replace with your actual token
+  const baseUrl = "http://localhost:4000";
+
+  async function fetchCourses() {
+    try {
+      const response = await fetch(`${baseUrl}/courses/show-all-my-courses`, {
+        headers: { 'Authorization': token }
+      });
+
+      if (!response.ok) {
+        alert('Failed to load courses. Status: ' + response.status);
+        return;
+      }
+
+      const courses = await response.json();
+      displayCourses(courses);
+    } catch (error) {
+      console.error(error);
+      alert('Error fetching courses.');
+    }
+  }
+
+  async function fetchCourseImage(courseId) {
+    try {
+      const response = await fetch(`${baseUrl}/courses/show-all-my-courses/${courseId}`, {
+        headers: { 'Authorization': token }
+      });
+
+      if (!response.ok) {
+        console.warn('Failed to load image for course:', courseId);
+        return null;
+      }
+
+      const blob = await response.blob();
+      return URL.createObjectURL(blob);
+    } catch (error) {
+      console.error('Error fetching image:', error);
+      return null;
+    }
+  }
+
+  async function displayCourses(courses) {
+    const container = document.getElementById('coursesContainer');
+    container.innerHTML = "";
+
+    for (const course of courses) {
+      const imageUrl = await fetchCourseImage(course.id);
+
+      const courseDiv = document.createElement('div');
+      courseDiv.className = "course";
+
+      const img = document.createElement('img');
+      img.src = imageUrl || '';
+      img.alt = course.title;
+
+      const detailsDiv = document.createElement('div');
+      detailsDiv.className = "course-details";
+      detailsDiv.innerHTML = `
+      <h2>${course.title}</h2>
+      <p>${course.description}</p>
+      <p><strong>Price:</strong> $${course.price}</p>
+      <p><strong>Duration:</strong> ${course.durationInMints} mins</p>
+      <p><strong>Language:</strong> ${course.language}</p>
+    `;
+
+      courseDiv.appendChild(img);
+      courseDiv.appendChild(detailsDiv);
+      container.appendChild(courseDiv);
+    }
+  }
+
+  // Initialize
+  fetchCourses();
+</script>
+</body>
+</html>

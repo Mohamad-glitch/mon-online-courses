@@ -3,13 +3,13 @@ package com.example.mononlinecourses.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "tags")
+@Table(name = "categories")
 @Data
-public class Tag {
+public class Categorise {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -17,16 +17,17 @@ public class Tag {
     private UUID id;
 
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
+
 
     @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE,
             CascadeType.PERSIST, CascadeType.DETACH})
     @JoinTable(
-            name = "course_tags",
-            joinColumns = @JoinColumn(name = "tag_id"),
+            name = "course_categories",
+            joinColumns = @JoinColumn(name = "category_id"),
             inverseJoinColumns = @JoinColumn(name = "course_id")
     )
-    private Set<Course> courses;
+    private List<Course> courses;
 
 }

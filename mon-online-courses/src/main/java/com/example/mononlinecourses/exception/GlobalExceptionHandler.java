@@ -87,4 +87,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
     }
 
+    @ExceptionHandler(ImageWasNotSent.class)
+    public ResponseEntity<Map<String, String>> imageWasNotSent(ImageWasNotSent imageWasNotSent) {
+        log.warn(imageWasNotSent.getMessage());
+        Map<String,String> map = new HashMap<>();
+        map.put("error","image was not sent");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
+    }
 }

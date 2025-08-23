@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name= "users")
+@Table(name = "users")
 @Data
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(updatable = false,  unique = true, name = "id")
+    @Column(updatable = false, unique = true, name = "id")
     private UUID id;
 
     @Column(nullable = false, unique = true, name = "email")
@@ -50,9 +50,26 @@ public class User {
     private Date lastLogin;
 
 
-    @OneToMany(cascade = CascadeType.ALL ,  mappedBy = "instructor")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "instructor")
     private List<Course> courses;
-    
+
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<Enrollment> userEnrollments;
+
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<Wishlist> userWishlist;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "instructor")
+    private List<InstructorPayment> instructorPayments;
+
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<Payment> userPayments;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<Review> userReviews;
 
 
 }

@@ -52,11 +52,6 @@ public class Course {
     @Column(name = "updated_at")
     private Date updatedAt;
 
-    /*
-    TODO: still did not add the relationship with user, sections and
-      tags the relation between user and courses has 5 join tables need to be handled
-
-     */
 
     @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE,
             CascadeType.PERSIST, CascadeType.DETACH})
@@ -68,8 +63,39 @@ public class Course {
     private List<Tag> tags;
 
 
-    @ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH})
+    @ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.MERGE,
+            CascadeType.PERSIST, CascadeType.DETACH})
     @JoinColumn(name = "instructor_id")
     private User instructor;
+
+
+    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE,
+            CascadeType.PERSIST, CascadeType.DETACH})
+    @JoinTable(
+            name = "course_categories",
+            joinColumns = @JoinColumn(name = "course_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private List<Categorise> categorises;
+
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
+    private List<Section> sections;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
+    private List<Enrollment> enrollments;
+
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
+    private List<Wishlist> wishlists;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
+    private List<InstructorPayment> instructorPayments;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
+    private List<Payment> coursePayments;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
+    private List<Review> courseReviews;
 
 }
