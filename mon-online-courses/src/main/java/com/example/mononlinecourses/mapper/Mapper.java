@@ -2,6 +2,7 @@ package com.example.mononlinecourses.mapper;
 
 import com.example.mononlinecourses.dto.CreateCourseRequest;
 import com.example.mononlinecourses.dto.RegisterRequest;
+import com.example.mononlinecourses.dto.ShowInstructorCourses;
 import com.example.mononlinecourses.dto.ShowUserResponse;
 import com.example.mononlinecourses.model.Course;
 import com.example.mononlinecourses.model.User;
@@ -33,6 +34,17 @@ public class Mapper {
         course.setLanguage(createCourseRequest.getCourseLanguage());
 
         return course;
+    }
+
+    public static ShowInstructorCourses showInstructorCoursesFromCourse(Course course) {
+        return new ShowInstructorCourses(
+                course.getId(),
+                course.getTitle(),
+                course.getDescription(),
+                course.getPrice(),
+                course.getDurationMinutes(),
+                course.getLanguage()
+        );
     }
 
 }

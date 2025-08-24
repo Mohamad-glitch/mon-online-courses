@@ -24,7 +24,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/courses")
-@CrossOrigin(origins = "http://localhost:4000")
+@CrossOrigin(origins = "*")
 public class CourseController {
 
     private final AuthService authService;
@@ -58,9 +58,10 @@ public class CourseController {
 
         isAuthorized(token.token());
 
-        if(createCourseRequest.getCourseImage() == null || createCourseRequest.getCourseImage().isEmpty()) {
+        if (createCourseRequest.getCourseImage() == null || createCourseRequest.getCourseImage().isEmpty()) {
             throw new ImageWasNotSent("there was no image was provided");
         }
+
 
         courseService.createCourse(createCourseRequest,
                 createCourseRequest.getCourseImage(),
@@ -78,7 +79,7 @@ public class CourseController {
         return ResponseEntity.ok().body(courseService.getAllInstructorCourses(authService.extractUserEmailFromToken(token)));
     }
 
-    @GetMapping("/show-all-my-courses/{id}")
+    @GetMapping("/show-course-image/{id}")
     public ResponseEntity<Resource> getCourseImageByCourseId(@RequestHeader("Authorization") String token, @PathVariable UUID id) throws IOException {
         isAuthorized(token);
 

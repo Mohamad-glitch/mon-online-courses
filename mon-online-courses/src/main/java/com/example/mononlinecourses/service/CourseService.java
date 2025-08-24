@@ -3,12 +3,11 @@ package com.example.mononlinecourses.service;
 import com.example.mononlinecourses.dto.CreateCourseRequest;
 import com.example.mononlinecourses.dto.ShowInstructorCourses;
 import com.example.mononlinecourses.exception.InstructorRoleNeeded;
+import com.example.mononlinecourses.exception.TagsRequiredException;
 import com.example.mononlinecourses.mapper.Mapper;
 import com.example.mononlinecourses.model.Course;
-import com.example.mononlinecourses.model.Tag;
 import com.example.mononlinecourses.model.User;
 import com.example.mononlinecourses.repository.CourseDao;
-import com.example.mononlinecourses.repository.TagDao;
 import jakarta.transaction.Transactional;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -22,7 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -32,15 +31,15 @@ public class CourseService {
     private final Path directoryPath = Paths.get("C:\\Users\\mshlo\\OneDrive\\Desktop\\images");
     private final AuthService authService;
     private final UserService userService;
-    private final TagDao tagDao;
     private final CourseDao courseDao;
+    private final TagService tagService;
 
 
-    public CourseService(AuthService authService, UserService userService, TagDao tagDao, CourseDao courseDao) {
+    public CourseService(AuthService authService, UserService userService, CourseDao courseDao, TagService tagService) {
         this.authService = authService;
         this.userService = userService;
-        this.tagDao = tagDao;
         this.courseDao = courseDao;
+        this.tagService = tagService;
     }
 
     public List<Course> getAllCourses() {
@@ -48,14 +47,25 @@ public class CourseService {
         return courseDao.findAll();
     }
 
+
+    public List<String> cleanTags(List<String> tags) {
+        List<String> result = new ArrayList<>();
+        for (String tag : tags) {
+            String temp = tag.toLowerCase().trim();
+            if (!temp.isEmpty()) {
+                result.add(temp);
+            }
+        }
+
+        if (result.isEmpty())
+            throw new TagsRequiredException("At least one tag is required to create a course.");
+
+        return result;
+    }
+
     /*
-    this method will take the user input to create a course so it will take like this
-    title, description, price, image
-    then save the image to this directoryPath and rename the file to img_ current date_hour,mint,seconds, ms then make the image with
-    jpg
-
-    TODO: still need to add to it dynamic inputs for category and tags
-
+    TODO : add a category for the course dynamically then show to instructor that he can add to the course sections
+        this is next update   
      */
     @Transactional
     public void createCourse(CreateCourseRequest createCourseRequest,
@@ -63,13 +73,18 @@ public class CourseService {
                              String instructorEmail
     ) {
 
+        /*
+         in this method it will make sure that the tags are rela no empty and
+          then make it to lower case then get back what is valid but if there is none it will throw an error
+         */
+        createCourseRequest.setTags(cleanTags(createCourseRequest.getTags()));
+
         if (!userService.isUserInstructor(instructorEmail)) {
             throw new InstructorRoleNeeded("you have to be Instructor to create a course");
         }
 
         User user = userService.findUserByEmail(instructorEmail).get();
 
-        Tag tag = tagDao.findTagsByName("IT");
 
         String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmssSSS").format(new Date());
         String newFileName = "img_" + timestamp + ".jpg";
@@ -89,22 +104,18 @@ public class CourseService {
         createCourse.setCreatedAt(new Date(System.currentTimeMillis()));
         createCourse.setUpdatedAt(new Date(System.currentTimeMillis()));
         createCourse.setInstructor(user);
-        createCourse.setTags(Collections.singletonList(tag));
+        createCourse.setTags(tagService.getAddedTags(createCourseRequest.getTags()));
         createCourse.setThumbnailUrl(targetPath.toString());
 
 
         courseDao.save(createCourse);
-
-
     }
 
     public List<ShowInstructorCourses> getAllInstructorCourses(String instructorEmail) {
 
 
         return courseDao.getCoursesByInstructor_Email(instructorEmail).stream()
-                .map(x ->
-                        new ShowInstructorCourses(x.getId(), x.getTitle(), x.getDescription(), x.getPrice(), x.getDurationMinutes(), x.getLanguage())
-                ).toList();
+                .map(Mapper::showInstructorCoursesFromCourse).toList();
     }
 
     public Resource getCourseImage(UUID id) {

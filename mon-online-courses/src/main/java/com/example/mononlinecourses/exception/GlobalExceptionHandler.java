@@ -94,4 +94,21 @@ public class GlobalExceptionHandler {
         map.put("error","image was not sent");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
     }
+
+    @ExceptionHandler(TagNameCantBeEmpty.class)
+    public ResponseEntity<Map<String, String>>  tagNameCantBeEmpty(TagNameCantBeEmpty e) {
+        log.warn(e.getMessage());
+        Map<String,String> map = new HashMap<>();
+        map.put("error","tag name cant be empty");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
+    }
+
+    @ExceptionHandler(TagsRequiredException.class)
+    public ResponseEntity<Map<String, String>> tagsRequiredException(TagsRequiredException e) {
+        log.warn(e.getMessage());
+        Map<String,String> map = new HashMap<>();
+        map.put("error","tags required");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
+    }
+
 }

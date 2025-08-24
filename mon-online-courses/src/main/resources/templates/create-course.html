@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Create Course</title>
+    <style>
+        label { font-weight: bold; }
+        input, textarea { width: 300px; }
+        .tag-button { margin: 2px; padding: 3px 6px; cursor: pointer; border: 1px solid #ccc; border-radius: 3px; display: inline-block; background-color: #f0f0f0; }
+        .tag-button.selected { background-color: #007BFF; color: white; }
+        #selectedTagsContainer { margin-top: 5px; }
+    </style>
 </head>
 <body>
 <h1>Create Course</h1>
@@ -20,8 +27,14 @@
     <label>Course Language:</label><br>
     <input type="text" name="courseLanguage" required><br><br>
 
-    <label>Instructor ID:</label><br>
-    <input type="text" name="instructorId" required><br><br>
+    <label>Existing Tags:</label><br>
+    <div id="existingTagsContainer"></div><br>
+
+    <label>New Tags (comma-separated):</label><br>
+    <input type="text" id="newTags" placeholder="e.g. Microservices, DevOps"><br><br>
+
+    <label>Selected Tags:</label><br>
+    <div id="selectedTagsContainer"></div><br>
 
     <label>Course Image:</label><br>
     <input type="file" name="courseImage" accept="image/*" required><br><br>
@@ -30,34 +43,126 @@
 </form>
 
 <script>
-    document.getElementById("courseForm").addEventListener("submit", async function (e) {
-        e.preventDefault();
+    const API_BASE = "http://localhost:4000"; // change if needed
+    const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtc2hsb29sMzhAZ21haWwuY29tIiwicm9sZSI6Imluc3RydWN0b3IiLCJmdWxsTmFtZSI6Im1vaGFtYWQiLCJpYXQiOjE3NTYwNDkzMjksImV4cCI6MTc1NjA4NTMyOX0.99HC1u-QPsj38ztSxs2ly5l8a_DzRP7exkhYeLZ5Bx8";    // replace with your JWT token
+    const selectedTags = new Set();
 
+    // Load existing tags and display as buttons
+    async function loadTags() {
+        try {
+            const res = await fetch(`${API_BASE}/tag/show-all-tags`);
+            if (!res.ok) throw new Error("Failed to load tags");
+            const tags = await res.json();
+            const container = document.getElementById("existingTagsContainer");
+            container.innerHTML = "";
+            tags.forEach(tag => {
+                const btn = document.createElement("span");
+                btn.className = "tag-button";
+                btn.textContent = tag.tagName;
+                btn.addEventListener("click", () => toggleTag(tag.tagName, btn));
+                container.appendChild(btn);
+            });
+        } catch (error) {
+            console.error("Error loading tags:", error);
+        }
+    }
+
+    // Toggle tag selection
+    function toggleTag(tagName, btn) {
+        if (selectedTags.has(tagName)) {
+            selectedTags.delete(tagName);
+            btn.classList.remove("selected");
+        } else {
+            selectedTags.add(tagName);
+            btn.classList.add("selected");
+        }
+        renderSelectedTags();
+    }
+
+    // Show selected tags
+    function renderSelectedTags() {
+        const container = document.getElementById("selectedTagsContainer");
+        container.innerHTML = "";
+        selectedTags.forEach(tag => {
+            const span = document.createElement("span");
+            span.textContent = tag;
+            span.className = "tag-button selected";
+            span.addEventListener("click", () => {
+                selectedTags.delete(tag);
+                renderSelectedTags();
+                const allButtons = document.querySelectorAll(".tag-button");
+                allButtons.forEach(btn => { if(btn.textContent === tag) btn.classList.remove("selected"); });
+            });
+            container.appendChild(span);
+        });
+    }
+
+    // Create new tags
+    async function createNewTags(newTagsArray) {
+        if (newTagsArray.length === 0) return;
+        const payload = newTagsArray.map(tag => ({ tagName: tag }));
+        const res = await fetch(`${API_BASE}/tag/create-list-of-tags`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token
+            },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error("Failed to create new tags");
+    }
+
+    // Handle form submission
+    document.getElementById("courseForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
         const form = e.target;
         const formData = new FormData(form);
 
-        // Add your real token here
-        const token = "Bearer your-jwt-token";
+        // Collect new tags
+        const newTagsInput = document.getElementById("newTags").value;
+        const newTags = newTagsInput.split(",").map(tag => tag.trim()).filter(tag => tag !== "");
 
+        // Add new tags to selection
+        newTags.forEach(tag => selectedTags.add(tag));
+
+        // Create any new tags in backend
         try {
-            const response = await fetch("http://localhost:4000/courses/create-course", {
+            await createNewTags(Array.from(newTags));
+        } catch (err) {
+            alert("Failed to create new tags. See console for details.");
+            return;
+        }
+
+        // Append all selected tags to FormData
+        formData.delete("tags");
+        selectedTags.forEach(tag => formData.append("tags", tag));
+
+        // Send course creation request
+        try {
+            const res = await fetch(`${API_BASE}/courses/create-course`, {
                 method: "POST",
-                headers: {
-                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtc2hsb29sMzhAZ21haWwuY29tIiwicm9sZSI6Imluc3RydWN0b3IiLCJmdWxsTmFtZSI6Im1vaGFtYWQiLCJpYXQiOjE3NTU5NDMwNzUsImV4cCI6MTc1NTk3OTA3NX0.5xliY-LDX5xoEZruLgU6PHSU6qv9OqK0mu6K9WTIrno"   // Send Authorization header
-                },
-                body: formData              // Keep formData as body for file upload
+                headers: { "Authorization": token },
+                body: formData
             });
 
-            if (response.ok) {
+            if (res.ok) {
                 alert("Course created successfully!");
+                form.reset();
+                selectedTags.clear();
+                renderSelectedTags();
+                loadTags();
             } else {
-                alert("Failed to create course. Status: " + response.status);
+                const text = await res.text();
+                alert("Failed to create course. Status: " + res.status + "\n" + text);
             }
         } catch (error) {
-            console.error("Error:", error);
+            console.error("Error creating course:", error);
             alert("An error occurred while creating the course.");
         }
     });
+
+    // Initial load
+    loadTags();
 </script>
 </body>
 </html>
