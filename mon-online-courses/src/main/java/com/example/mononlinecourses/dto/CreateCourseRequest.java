@@ -27,6 +27,8 @@ public class CreateCourseRequest {
 
     private List<String> tags;
 
+    private List<String> category;
+
     private MultipartFile courseImage;
 
 }

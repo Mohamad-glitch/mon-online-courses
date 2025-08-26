@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Portal</title>
+    <style>
+        /* === Base Styles === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Inter", sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+        }
+
+        /* === Card Container === */
+        .auth-container {
+            background: #fff;
+            width: 380px;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .auth-header h2 {
+            font-size: 1.8rem;
+            color: #222;
+        }
+
+        /* === Forms === */
+        .form {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .form.active {
+            display: flex;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .input-group label {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .input-group input {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: #2575fc;
+            outline: none;
+            box-shadow: 0 0 5px rgba(37, 117, 252, 0.3);
+        }
+
+        /* === Buttons === */
+        button {
+            padding: 12px;
+            background: #2575fc;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #1d5fd1;
+        }
+
+        /* === Toggle Link === */
+        .toggle-text {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .toggle-text:hover {
+            color: #2575fc;
+        }
+
+        /* === Messages === */
+        .message {
+            font-size: 13px;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .message.error {
+            color: #e63946;
+        }
+
+        .message.success {
+            color: #2a9d8f;
+        }
+
+        /* === Animation === */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* === Responsive === */
+        @media (max-width: 420px) {
+            .auth-container {
+                width: 90%;
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="auth-header">
+        <h2 id="formTitle">Welcome Back</h2>
+    </div>
+
+    <!-- Login Form -->
+    <div id="loginForm" class="form active">
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" placeholder="Enter your email">
+        </div>
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter your password">
+        </div>
+        <button onclick="handleLogin()">Login</button>
+        <p class="toggle-text" onclick="toggleForms()">Don't have an account? Register</p>
+        <p id="loginMessage" class="message"></p>
+    </div>
+
+    <!-- Register Form -->
+    <div id="registerForm" class="form">
+        <div class="input-group">
+            <label>Full Name</label>
+            <input type="text" id="registerName" placeholder="Enter your full name">
+        </div>
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="registerEmail" placeholder="Enter your email">
+        </div>
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="registerPassword" placeholder="Min 6 characters">
+        </div>
+        <button onclick="handleRegister()">Register</button>
+        <p class="toggle-text" onclick="toggleForms()">Already have an account? Login</p>
+        <p id="registerMessage" class="message"></p>
+    </div>
+</div>
+
+<script>
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const formTitle = document.getElementById('formTitle');
+
+    function toggleForms() {
+        const isLoginActive = loginForm.classList.contains('active');
+        loginForm.classList.toggle('active');
+        registerForm.classList.toggle('active');
+        formTitle.textContent = isLoginActive ? "Create Account" : "Welcome Back";
+    }
+
+    // Simple email validator
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    async function handleLogin() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+        const msg = document.getElementById('loginMessage');
+        msg.textContent = "";
+
+        // Basic validation
+        if (!isValidEmail(email)) {
+            msg.className = "message error";
+            msg.textContent = "Enter a valid email address";
+            return;
+        }
+        if (password.length < 6) {
+            msg.className = "message error";
+            msg.textContent = "Password must be at least 6 characters";
+            return;
+        }
+
+        try {
+            const res = await fetch("/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (res.ok) {
+                msg.className = "message success";
+                msg.textContent = "Login successful!";
+            } else {
+                msg.className = "message error";
+                msg.textContent = "Invalid email or password";
+            }
+        } catch (e) {
+            msg.className = "message error";
+            msg.textContent = "Network error!";
+        }
+    }
+
+    async function handleRegister() {
+        const fullName = document.getElementById('registerName').value.trim();
+        const email = document.getElementById('registerEmail').value.trim();
+        const password = document.getElementById('registerPassword').value.trim();
+        const msg = document.getElementById('registerMessage');
+        msg.textContent = "";
+
+        // === Validation before sending request ===
+        if (fullName.length < 3) {
+            msg.className = "message error";
+            msg.textContent = "Full name must be at least 3 characters";
+            return;
+        }
+        if (!isValidEmail(email)) {
+            msg.className = "message error";
+            msg.textContent = "Enter a valid email address";
+            return;
+        }
+        if (password.length < 6) {
+            msg.className = "message error";
+            msg.textContent = "Password must be at least 6 characters";
+            return;
+        }
+
+        try {
+            const res = await fetch("/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, fullName, password })
+            });
+
+            if (res.status === 201) {
+                msg.className = "message success";
+                msg.textContent = "Registration successful! Redirecting...";
+
+                // Wait then switch back to login
+                setTimeout(() => {
+                    toggleForms();
+                }, 1500);
+            } else if (res.status === 409) {
+                msg.className = "message error";
+                msg.textContent = "Email already registered!";
+            } else {
+                msg.className = "message error";
+                msg.textContent = "Invalid input!";
+            }
+        } catch (e) {
+            msg.className = "message error";
+            msg.textContent = "Network error!";
+        }
+    }
+</script>
+
+</body>
+</html>

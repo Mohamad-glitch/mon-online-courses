@@ -21,7 +21,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     @Operation(summary = "user login",
             description = "take user email and password if they are correct it will return JWT else error")
     @ApiResponses(value = {
@@ -51,10 +51,16 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "create new user", description = "it will take the user info and save it")
-    @ApiResponse(
-            responseCode = "201",
-            description = "will return nothing"
-    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "will return nothing"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "if the email is already rester this error will appear"
+            )
+    })
     public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest registerRequest) {
 
         authService.register(registerRequest);

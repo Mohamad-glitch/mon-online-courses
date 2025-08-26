@@ -2,6 +2,7 @@ package com.example.mononlinecourses.service;
 
 import com.example.mononlinecourses.dto.CreateCourseRequest;
 import com.example.mononlinecourses.dto.ShowInstructorCourses;
+import com.example.mononlinecourses.exception.CategoryNameCantBeEmpty;
 import com.example.mononlinecourses.exception.InstructorRoleNeeded;
 import com.example.mononlinecourses.exception.TagsRequiredException;
 import com.example.mononlinecourses.mapper.Mapper;
@@ -21,25 +22,25 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class CourseService {
-    private final Path directoryPath = Paths.get("C:\\Users\\mshlo\\OneDrive\\Desktop\\images");
+    private final FileService fileService;
     private final AuthService authService;
     private final UserService userService;
     private final CourseDao courseDao;
     private final TagService tagService;
+    private final CategoryService categoryService;
 
 
-    public CourseService(AuthService authService, UserService userService, CourseDao courseDao, TagService tagService) {
+    public CourseService(FileService fileService, AuthService authService, UserService userService, CourseDao courseDao, TagService tagService, CategoryService categoryService) {
+        this.fileService = fileService;
         this.authService = authService;
         this.userService = userService;
         this.courseDao = courseDao;
         this.tagService = tagService;
+        this.categoryService = categoryService;
     }
 
     public List<Course> getAllCourses() {
@@ -49,16 +50,27 @@ public class CourseService {
 
 
     public List<String> cleanTags(List<String> tags) {
-        List<String> result = new ArrayList<>();
-        for (String tag : tags) {
-            String temp = tag.toLowerCase().trim();
-            if (!temp.isEmpty()) {
-                result.add(temp);
-            }
-        }
+        List<String> result = tags.stream()
+                .map(tag -> tag.toLowerCase().trim())
+                .filter(tag -> !tag.isEmpty())
+                .toList();
 
-        if (result.isEmpty())
+        if (result.isEmpty()) {
             throw new TagsRequiredException("At least one tag is required to create a course.");
+        }
+        return result;
+    }
+
+    public List<String> cleanCategory(List<String> categorise) {
+        List<String> result = categorise.stream()
+                .map(category -> category.toLowerCase().trim())
+                .filter(category -> !category.isEmpty())
+                .toList();
+
+
+        if(result.isEmpty())
+            throw new CategoryNameCantBeEmpty("Category name cannot be empty.");
+
 
         return result;
     }
@@ -76,27 +88,19 @@ public class CourseService {
         /*
          in this method it will make sure that the tags are rela no empty and
           then make it to lower case then get back what is valid but if there is none it will throw an error
+          cleanCategory(createCourseRequest.getCategory())
          */
         createCourseRequest.setTags(cleanTags(createCourseRequest.getTags()));
+        createCourseRequest.setCategory(List.of("web development"));
 
-        if (!userService.isUserInstructor(instructorEmail)) {
+        if (!userService.isUserInstructor(instructorEmail))
             throw new InstructorRoleNeeded("you have to be Instructor to create a course");
-        }
+
 
         User user = userService.findUserByEmail(instructorEmail).get();
 
 
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmssSSS").format(new Date());
-        String newFileName = "img_" + timestamp + ".jpg";
 
-        Path targetPath = directoryPath.resolve(newFileName);
-
-        try {
-            // Save the file to the directory
-            Files.copy(courseImage.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to save course image", e);
-        }
 
 
         Course createCourse = Mapper.getCourseFromCreateCourseRequest(createCourseRequest);
@@ -105,7 +109,8 @@ public class CourseService {
         createCourse.setUpdatedAt(new Date(System.currentTimeMillis()));
         createCourse.setInstructor(user);
         createCourse.setTags(tagService.getAddedTags(createCourseRequest.getTags()));
-        createCourse.setThumbnailUrl(targetPath.toString());
+        createCourse.setThumbnailUrl(fileService.savedImage(courseImage));
+        createCourse.setCategorises(categoryService.getAddedCategorise(createCourseRequest.getCategory()));
 
 
         courseDao.save(createCourse);

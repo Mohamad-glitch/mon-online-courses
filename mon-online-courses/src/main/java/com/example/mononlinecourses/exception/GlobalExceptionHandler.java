@@ -111,4 +111,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
     }
 
+
+    @ExceptionHandler(CategoryNameCantBeEmpty.class)
+    public ResponseEntity<Map<String, String>> categoryNameCantBeEmpty(CategoryNameCantBeEmpty e) {
+        log.warn(e.getMessage());
+        Map<String,String> map = new HashMap<>();
+        map.put("error","category name cant be empty");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
+    }
+
 }
