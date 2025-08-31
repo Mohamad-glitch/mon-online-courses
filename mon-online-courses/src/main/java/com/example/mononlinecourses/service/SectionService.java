@@ -1,15 +1,20 @@
 package com.example.mononlinecourses.service;
 
 import com.example.mononlinecourses.dto.Requests.CreateSectionRequest;
+import com.example.mononlinecourses.dto.Requests.UpdateSection;
 import com.example.mononlinecourses.dto.responses.ShowCourseSection;
+import com.example.mononlinecourses.exception.NotAuthorized;
 import com.example.mononlinecourses.exception.SectionHasPostionAlready;
 import com.example.mononlinecourses.mapper.SectionMapper;
 import com.example.mononlinecourses.model.Course;
 import com.example.mononlinecourses.model.Section;
 import com.example.mononlinecourses.repository.SectionDao;
+import com.example.mononlinecourses.utils.JwtUtils;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,12 +23,26 @@ public class SectionService {
 
     private final CourseService courseService;
     private final SectionDao sectionDao;
+    private final UserService userService;
+    private JwtUtils jwtUtils;
 
-    public SectionService(CourseService courseService, SectionDao sectionDao) {
+    @Autowired
+    public SectionService(CourseService courseService, SectionDao sectionDao, UserService userService) {
         this.courseService = courseService;
         this.sectionDao = sectionDao;
+        this.userService = userService;
     }
 
+    @Autowired
+    public void setJwtUtils(JwtUtils jwtUtils) {
+        this.jwtUtils = jwtUtils;
+    }
+
+    public void isSectionOwnedByInstructor(String token, UUID sectionId) {
+        if(!sectionDao.isSectionOwnedByInstructor(userService.getInstructorID(jwtUtils.extractEmail(token))
+                , sectionId))
+            throw new NotAuthorized("you are not authorized to change the section");
+    }
 
     public void checkPositionExists(long sectionPosition, UUID courseId) {
         if(sectionDao.existsByPositionAndCourse(sectionPosition, courseService.getCourseById(courseId)))
@@ -50,5 +69,18 @@ public class SectionService {
 
         return course.getSections().stream()
                 .map(SectionMapper::fromSectionToShowCourseSection).toList();
+    }
+
+    public void updateSection(UpdateSection updateSection, String token){
+        isSectionOwnedByInstructor(token, updateSection.sectionId());
+
+        Section updated = sectionDao.getById(updateSection.sectionId());
+        updated.setTitle(updateSection.sectionTitle());
+        updated.setUpdatedAt(new Date(System.currentTimeMillis()));
+        sectionDao.save(updated);
+    }
+
+    public void deleteSectionById(UUID sectionId) {
+        sectionDao.deleteById(sectionId);
     }
 }

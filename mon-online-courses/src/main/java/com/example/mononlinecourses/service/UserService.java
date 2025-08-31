@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -65,6 +66,8 @@ public class UserService {
         return userDao.existsByEmailAndRole(email, Roles.instructor);
     }
 
-
+    public UUID getInstructorID(String email){
+        return userDao.getUserIdByEmail(email);
+    }
 
 }

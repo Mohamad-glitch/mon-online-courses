@@ -127,4 +127,12 @@ public class GlobalExceptionHandler {
         map.put("error",e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
     }
+
+    @ExceptionHandler(NotAuthorized.class)
+    public ResponseEntity<Map<String, String>> notAuthorized(NotAuthorized e) {
+        log.warn(e.getMessage());
+        Map<String,String> map = new HashMap<>();
+        map.put("error",e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(map);
+    }
 }
