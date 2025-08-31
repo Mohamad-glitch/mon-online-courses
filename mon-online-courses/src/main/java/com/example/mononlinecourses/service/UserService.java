@@ -1,7 +1,7 @@
 package com.example.mononlinecourses.service;
 
-import com.example.mononlinecourses.dto.ShowUserResponse;
-import com.example.mononlinecourses.dto.UpdateUserInfoRequest;
+import com.example.mononlinecourses.dto.responses.ShowUserResponse;
+import com.example.mononlinecourses.dto.Requests.UpdateUserInfoRequest;
 import com.example.mononlinecourses.enums.Roles;
 import com.example.mononlinecourses.exception.UserExists;
 import com.example.mononlinecourses.mapper.Mapper;

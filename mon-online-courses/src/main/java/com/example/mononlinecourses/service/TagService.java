@@ -1,7 +1,7 @@
 package com.example.mononlinecourses.service;
 
-import com.example.mononlinecourses.dto.CreateTagRequest;
-import com.example.mononlinecourses.dto.ShowTagsResponse;
+import com.example.mononlinecourses.dto.Requests.CreateTagRequest;
+import com.example.mononlinecourses.dto.responses.ShowTagsResponse;
 import com.example.mononlinecourses.exception.TagNameCantBeEmpty;
 import com.example.mononlinecourses.mapper.TagMapper;
 import com.example.mononlinecourses.model.Tag;

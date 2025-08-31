@@ -1,4 +1,4 @@
-package com.example.mononlinecourses.dto;
+package com.example.mononlinecourses.dto.responses;
 
 public record ShowUserResponse(
         String fullName,

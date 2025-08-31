@@ -1,6 +1,10 @@
 package com.example.mononlinecourses.controller;
 
-import com.example.mononlinecourses.dto.*;
+import com.example.mononlinecourses.dto.Requests.LoginRequest;
+import com.example.mononlinecourses.dto.Requests.NewPassword;
+import com.example.mononlinecourses.dto.Requests.RegisterRequest;
+import com.example.mononlinecourses.dto.Requests.ResetPasswordRequest;
+import com.example.mononlinecourses.dto.responses.LoginResponse;
 import com.example.mononlinecourses.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

@@ -1,7 +1,7 @@
 package com.example.mononlinecourses.controller;
 
-import com.example.mononlinecourses.dto.CreateTagRequest;
-import com.example.mononlinecourses.dto.ShowTagsResponse;
+import com.example.mononlinecourses.dto.Requests.CreateTagRequest;
+import com.example.mononlinecourses.dto.responses.ShowTagsResponse;
 import com.example.mononlinecourses.service.TagService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

@@ -1,6 +1,6 @@
 package com.example.mononlinecourses.mapper;
 
-import com.example.mononlinecourses.dto.ShowCategoryResponse;
+import com.example.mononlinecourses.dto.responses.ShowCategoryResponse;
 import com.example.mononlinecourses.model.Categorise;
 
 public class CategoryMapper {

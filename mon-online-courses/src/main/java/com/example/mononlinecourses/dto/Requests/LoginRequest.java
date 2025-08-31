@@ -1,4 +1,4 @@
-package com.example.mononlinecourses.dto;
+package com.example.mononlinecourses.dto.Requests;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;

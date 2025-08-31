@@ -1,4 +1,4 @@
-package com.example.mononlinecourses.dto;
+package com.example.mononlinecourses.dto.responses;
 
 import java.util.UUID;
 

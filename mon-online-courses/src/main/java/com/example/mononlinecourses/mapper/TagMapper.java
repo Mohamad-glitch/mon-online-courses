@@ -1,6 +1,6 @@
 package com.example.mononlinecourses.mapper;
 
-import com.example.mononlinecourses.dto.ShowTagsResponse;
+import com.example.mononlinecourses.dto.responses.ShowTagsResponse;
 import com.example.mononlinecourses.model.Tag;
 
 public class TagMapper {

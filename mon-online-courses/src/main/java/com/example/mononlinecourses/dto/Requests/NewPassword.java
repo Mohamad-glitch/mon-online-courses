@@ -1,4 +1,4 @@
-package com.example.mononlinecourses.dto;
+package com.example.mononlinecourses.dto.Requests;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;

@@ -1,10 +1,11 @@
 package com.example.mononlinecourses.controller;
 
-import com.example.mononlinecourses.dto.CreateCourseRequest;
-import com.example.mononlinecourses.dto.RequestToken;
-import com.example.mononlinecourses.dto.ShowInstructorCourses;
+import com.example.mononlinecourses.dto.Requests.CreateCourseRequest;
+import com.example.mononlinecourses.dto.Requests.RequestToken;
+import com.example.mononlinecourses.dto.responses.PagedResponse;
+import com.example.mononlinecourses.dto.responses.ShowCoursesResponse;
+import com.example.mononlinecourses.dto.responses.ShowInstructorCourses;
 import com.example.mononlinecourses.exception.ImageWasNotSent;
-import com.example.mononlinecourses.model.Course;
 import com.example.mononlinecourses.service.AuthService;
 import com.example.mononlinecourses.service.CourseService;
 import jakarta.validation.Valid;
@@ -42,12 +43,13 @@ public class CourseController {
     }
 
     @GetMapping("/show-all-courses")
-    public ResponseEntity<Void> showAllCourses() {
+    public ResponseEntity<PagedResponse<ShowCoursesResponse>> showAllCourses(
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "10") int pageSize
+    ) {
 
-        List<Course> courses = courseService.getAllCourses();
-        courses.forEach(System.out::println);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(courseService.getAllCourses(pageNumber, pageSize));
     }
 
     //TODO: add the swagger doc to the controller
@@ -80,8 +82,9 @@ public class CourseController {
     }
 
     @GetMapping("/show-course-image/{id}")
-    public ResponseEntity<Resource> getCourseImageByCourseId(@RequestHeader("Authorization") String token, @PathVariable UUID id) throws IOException {
-        isAuthorized(token);
+    public ResponseEntity<Resource> getCourseImageByCourseId(@PathVariable UUID id) throws IOException {
+        //@RequestHeader("Authorization") String token,
+        //isAuthorized(token);
 
         Resource image = courseService.getCourseImage(id);
         Path path = Paths.get(image.getURI());
@@ -90,5 +93,6 @@ public class CourseController {
                 .header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(path))
                 .body(image);
     }
+
 
 }

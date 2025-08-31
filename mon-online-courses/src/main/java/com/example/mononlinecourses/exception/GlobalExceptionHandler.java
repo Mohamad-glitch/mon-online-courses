@@ -120,4 +120,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
     }
 
+    @ExceptionHandler(SectionHasPostionAlready.class)
+    public ResponseEntity<Map<String, String>> sectionHasPostionAlready(SectionHasPostionAlready e) {
+        log.warn(e.getMessage());
+        Map<String,String> map = new HashMap<>();
+        map.put("error",e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
+    }
 }

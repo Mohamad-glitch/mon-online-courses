@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+<<<<<<< Updated upstream
     <title>Courses Login</title>
     <style>
         body {
@@ -102,11 +103,51 @@
         
         .no-account:hover {
             color: #6a11cb;
+=======
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - LearnHub</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
+        .form-container {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .form-container input {
+            width: 100%;
+            padding: 0.7rem;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .form-container button {
+            width: 100%;
+            padding: 0.7rem;
+            background: #4f46e5;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+>>>>>>> Stashed changes
+        }
+        .form-container button:hover { background: #4338ca; }
+        .error-msg { color: red; font-size: 0.9rem; }
     </style>
 </head>
 
 <body>
+<<<<<<< Updated upstream
     <div class="login-container">
         <div class="login-title">Courses Login</div>
         <form class="login-form">
@@ -118,6 +159,40 @@
         </form>
         <button class="no-account" onclick="alert('Redirect to registration page')">Don't have an account?</button>
     </div>
+=======
+<div class="form-container">
+    <h2>Login</h2>
+    <input type="email" id="loginEmail" placeholder="Email">
+    <input type="password" id="loginPassword" placeholder="Password">
+    <button id="loginBtn">Login</button>
+    <p id="loginError" class="error-msg"></p>
+    <p>Don't have an account? <a href="../signup-page">Sign Up</a></p>
+</div>
+<script>
+    const apiBase = "http://localhost:4000";
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const errorEl = document.getElementById('loginError');
+        errorEl.textContent = "";
+        try {
+            const res = await fetch(`${apiBase}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            if (!res.ok) throw res;
+            const data = await res.json();
+            localStorage.setItem('jwt', data.token);
+            window.location.href = "../";
+        } catch (err) {
+            if (err.status === 400) errorEl.textContent = "Invalid email or password";
+            else if (err.status === 404) errorEl.textContent = "User not found";
+            else errorEl.textContent = "Error logging in";
+        }
+    });
+</script>
+>>>>>>> Stashed changes
 </body>
 
 </html>

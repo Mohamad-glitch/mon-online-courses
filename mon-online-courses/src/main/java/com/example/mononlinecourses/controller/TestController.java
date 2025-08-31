@@ -2,7 +2,6 @@ package com.example.mononlinecourses.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 //@RequestMapping("/test")
@@ -22,6 +21,16 @@ public class TestController {
     @GetMapping("/login-page")
     public String loginPage() {
         return "login-page";
+    }
+
+    @GetMapping("/")
+    public String homePage() {
+        return "home-page";
+    }
+
+    @GetMapping("/signup-page")
+    public String signupPage() {
+        return "signup-page";
     }
 
 }

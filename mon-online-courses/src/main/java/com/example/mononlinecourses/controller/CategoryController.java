@@ -1,7 +1,7 @@
 package com.example.mononlinecourses.controller;
 
-import com.example.mononlinecourses.dto.CreateCategoryRequest;
-import com.example.mononlinecourses.dto.ShowCategoryResponse;
+import com.example.mononlinecourses.dto.Requests.CreateCategoryRequest;
+import com.example.mononlinecourses.dto.responses.ShowCategoryResponse;
 import com.example.mononlinecourses.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

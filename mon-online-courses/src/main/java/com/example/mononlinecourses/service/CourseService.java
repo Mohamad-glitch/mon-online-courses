@@ -1,7 +1,9 @@
 package com.example.mononlinecourses.service;
 
-import com.example.mononlinecourses.dto.CreateCourseRequest;
-import com.example.mononlinecourses.dto.ShowInstructorCourses;
+import com.example.mononlinecourses.dto.Requests.CreateCourseRequest;
+import com.example.mononlinecourses.dto.responses.PagedResponse;
+import com.example.mononlinecourses.dto.responses.ShowCoursesResponse;
+import com.example.mononlinecourses.dto.responses.ShowInstructorCourses;
 import com.example.mononlinecourses.exception.CategoryNameCantBeEmpty;
 import com.example.mononlinecourses.exception.InstructorRoleNeeded;
 import com.example.mononlinecourses.exception.TagsRequiredException;
@@ -12,17 +14,17 @@ import com.example.mononlinecourses.repository.CourseDao;
 import jakarta.transaction.Transactional;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class CourseService {
@@ -43,9 +45,18 @@ public class CourseService {
         this.categoryService = categoryService;
     }
 
-    public List<Course> getAllCourses() {
+    public PagedResponse<ShowCoursesResponse> getAllCourses(int pageNumber, int pageSize) {
 
-        return courseDao.findAll();
+        Page page = courseDao.findAll(PageRequest.of(pageNumber, pageSize)).map(Mapper::showCoursesResponseFromCourse);
+
+        return new PagedResponse<>(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast()
+        );
     }
 
 
@@ -68,7 +79,7 @@ public class CourseService {
                 .toList();
 
 
-        if(result.isEmpty())
+        if (result.isEmpty())
             throw new CategoryNameCantBeEmpty("Category name cannot be empty.");
 
 
@@ -91,16 +102,13 @@ public class CourseService {
           cleanCategory(createCourseRequest.getCategory())
          */
         createCourseRequest.setTags(cleanTags(createCourseRequest.getTags()));
-        createCourseRequest.setCategory(List.of("web development"));
+        createCourseRequest.setCategory(cleanCategory(createCourseRequest.getCategory()));
 
         if (!userService.isUserInstructor(instructorEmail))
             throw new InstructorRoleNeeded("you have to be Instructor to create a course");
 
 
         User user = userService.findUserByEmail(instructorEmail).get();
-
-
-
 
 
         Course createCourse = Mapper.getCourseFromCreateCourseRequest(createCourseRequest);
@@ -136,5 +144,9 @@ public class CourseService {
             System.out.println("Malformed URL: " + e.getMessage());
             return null;
         }
+    }
+
+    public Course getCourseById(UUID id) {
+        return courseDao.findById(id).get();
     }
 }

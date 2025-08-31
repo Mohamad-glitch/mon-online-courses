@@ -1,7 +1,7 @@
 package com.example.mononlinecourses.service;
 
-import com.example.mononlinecourses.dto.CreateCategoryRequest;
-import com.example.mononlinecourses.dto.ShowCategoryResponse;
+import com.example.mononlinecourses.dto.Requests.CreateCategoryRequest;
+import com.example.mononlinecourses.dto.responses.ShowCategoryResponse;
 import com.example.mononlinecourses.exception.CategoryNameCantBeEmpty;
 import com.example.mononlinecourses.mapper.CategoryMapper;
 import com.example.mononlinecourses.model.Categorise;

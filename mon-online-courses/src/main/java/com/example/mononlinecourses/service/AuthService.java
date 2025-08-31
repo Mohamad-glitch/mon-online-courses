@@ -1,6 +1,10 @@
 package com.example.mononlinecourses.service;
 
-import com.example.mononlinecourses.dto.*;
+import com.example.mononlinecourses.dto.Requests.LoginRequest;
+import com.example.mononlinecourses.dto.Requests.NewPassword;
+import com.example.mononlinecourses.dto.Requests.RegisterRequest;
+import com.example.mononlinecourses.dto.Requests.ResetPasswordRequest;
+import com.example.mononlinecourses.dto.responses.LoginResponse;
 import com.example.mononlinecourses.enums.Roles;
 import com.example.mononlinecourses.exception.UserNotFound;
 import com.example.mononlinecourses.exception.UserPasswordOrEmailIsNotCorrect;

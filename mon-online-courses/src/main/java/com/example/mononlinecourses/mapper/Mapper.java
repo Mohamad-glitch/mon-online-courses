@@ -1,9 +1,10 @@
 package com.example.mononlinecourses.mapper;
 
-import com.example.mononlinecourses.dto.CreateCourseRequest;
-import com.example.mononlinecourses.dto.RegisterRequest;
-import com.example.mononlinecourses.dto.ShowInstructorCourses;
-import com.example.mononlinecourses.dto.ShowUserResponse;
+import com.example.mononlinecourses.dto.Requests.CreateCourseRequest;
+import com.example.mononlinecourses.dto.Requests.RegisterRequest;
+import com.example.mononlinecourses.dto.responses.ShowCoursesResponse;
+import com.example.mononlinecourses.dto.responses.ShowInstructorCourses;
+import com.example.mononlinecourses.dto.responses.ShowUserResponse;
 import com.example.mononlinecourses.model.Course;
 import com.example.mononlinecourses.model.User;
 
@@ -47,4 +48,15 @@ public class Mapper {
         );
     }
 
+    public static ShowCoursesResponse showCoursesResponseFromCourse(Course course) {
+        return new ShowCoursesResponse(
+                course.getId(),
+                course.getTitle(),
+                course.getDescription(),
+                course.getPrice(),
+                course.getDurationMinutes(),
+                course.getRatingAverage(),
+                course.getLanguage()
+        );
+    }
 }
