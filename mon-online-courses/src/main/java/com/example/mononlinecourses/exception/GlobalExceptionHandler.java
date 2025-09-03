@@ -1,7 +1,6 @@
 package com.example.mononlinecourses.exception;
 
 import io.jsonwebtoken.JwtException;
-import jakarta.xml.bind.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -19,26 +18,26 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(UserNotFound.class)
-    public ResponseEntity<Map<String,String>> userNotFound(UserNotFound userNotFound) {
+    public ResponseEntity<Map<String, String>> userNotFound(UserNotFound userNotFound) {
         log.warn(userNotFound.getMessage());
-        Map<String,String> map = new HashMap<>();
-        map.put("error","User not found");
+        Map<String, String> map = new HashMap<>();
+        map.put("error", "User not found");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
     }
 
     @ExceptionHandler(UserPasswordOrEmailIsNotCorrect.class)
-    public ResponseEntity<Map<String, String >> userPasswordOrEmailNotCorrect(UserPasswordOrEmailIsNotCorrect userPasswordOrEmailIsNotCorrect){
+    public ResponseEntity<Map<String, String>> userPasswordOrEmailNotCorrect(UserPasswordOrEmailIsNotCorrect userPasswordOrEmailIsNotCorrect) {
         log.warn(userPasswordOrEmailIsNotCorrect.getMessage());
-        Map<String,String> map = new HashMap<>();
-        map.put("error","User password or email is not correct");
+        Map<String, String> map = new HashMap<>();
+        map.put("error", "User password or email is not correct");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
     }
 
     @ExceptionHandler(JwtException.class)
-    public ResponseEntity<Map<String, String >> jwtError(JwtException e){
+    public ResponseEntity<Map<String, String>> jwtError(JwtException e) {
         log.warn(e.getMessage());
-        Map<String,String> map = new HashMap<>();
-        map.put("error","Unauthorized");
+        Map<String, String> map = new HashMap<>();
+        map.put("error", "Unauthorized");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(map);
     }
 
@@ -54,60 +53,60 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserExists.class)
-    public ResponseEntity<Map<String,String>> userExists(UserExists userExists) {
+    public ResponseEntity<Map<String, String>> userExists(UserExists userExists) {
         log.warn(userExists.getMessage());
-        Map<String,String> map = new HashMap<>();
-        map.put("error","User exists");
+        Map<String, String> map = new HashMap<>();
+        map.put("error", "User exists");
         return ResponseEntity.status(HttpStatus.CONFLICT).body(map);
     }
 
 
     @ExceptionHandler(InvalidCredentials.class)
-    public ResponseEntity<Map<String,String>> invalidCredentials(InvalidCredentials invalidCredentials) {
+    public ResponseEntity<Map<String, String>> invalidCredentials(InvalidCredentials invalidCredentials) {
         log.warn(invalidCredentials.getMessage());
-        Map<String,String> map = new HashMap<>();
-        map.put("error","Invalid credentials");
+        Map<String, String> map = new HashMap<>();
+        map.put("error", "Invalid credentials");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
     }
 
 
     @ExceptionHandler(UrlHasBeenUsed.class)
-    public ResponseEntity<Map<String ,String>>  urlHasBeenUsed(UrlHasBeenUsed urlHasBeenUsed){
+    public ResponseEntity<Map<String, String>> urlHasBeenUsed(UrlHasBeenUsed urlHasBeenUsed) {
         log.warn(urlHasBeenUsed.getMessage());
-        Map<String ,String> map = new HashMap<>();
-        map.put("error","url has been used");
+        Map<String, String> map = new HashMap<>();
+        map.put("error", "url has been used");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
     }
 
     @ExceptionHandler(InstructorRoleNeeded.class)
-    public ResponseEntity<Map<String, String>>  instructorRoleNeeded(InstructorRoleNeeded e) {
+    public ResponseEntity<Map<String, String>> instructorRoleNeeded(InstructorRoleNeeded e) {
         log.warn(e.getMessage());
-        Map<String,String> map = new HashMap<>();
-        map.put("error",e.getMessage());
+        Map<String, String> map = new HashMap<>();
+        map.put("error", e.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
     }
 
     @ExceptionHandler(ImageWasNotSent.class)
     public ResponseEntity<Map<String, String>> imageWasNotSent(ImageWasNotSent imageWasNotSent) {
         log.warn(imageWasNotSent.getMessage());
-        Map<String,String> map = new HashMap<>();
-        map.put("error","image was not sent");
+        Map<String, String> map = new HashMap<>();
+        map.put("error", "image was not sent");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
     }
 
     @ExceptionHandler(TagNameCantBeEmpty.class)
-    public ResponseEntity<Map<String, String>>  tagNameCantBeEmpty(TagNameCantBeEmpty e) {
+    public ResponseEntity<Map<String, String>> tagNameCantBeEmpty(TagNameCantBeEmpty e) {
         log.warn(e.getMessage());
-        Map<String,String> map = new HashMap<>();
-        map.put("error","tag name cant be empty");
+        Map<String, String> map = new HashMap<>();
+        map.put("error", "tag name cant be empty");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
     }
 
     @ExceptionHandler(TagsRequiredException.class)
     public ResponseEntity<Map<String, String>> tagsRequiredException(TagsRequiredException e) {
         log.warn(e.getMessage());
-        Map<String,String> map = new HashMap<>();
-        map.put("error","tags required");
+        Map<String, String> map = new HashMap<>();
+        map.put("error", "tags required");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
     }
 
@@ -115,24 +114,49 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CategoryNameCantBeEmpty.class)
     public ResponseEntity<Map<String, String>> categoryNameCantBeEmpty(CategoryNameCantBeEmpty e) {
         log.warn(e.getMessage());
-        Map<String,String> map = new HashMap<>();
-        map.put("error","category name cant be empty");
+        Map<String, String> map = new HashMap<>();
+        map.put("error", "category name cant be empty");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
     }
 
     @ExceptionHandler(SectionHasPostionAlready.class)
     public ResponseEntity<Map<String, String>> sectionHasPostionAlready(SectionHasPostionAlready e) {
         log.warn(e.getMessage());
-        Map<String,String> map = new HashMap<>();
-        map.put("error",e.getMessage());
+        Map<String, String> map = new HashMap<>();
+        map.put("error", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
     }
 
     @ExceptionHandler(NotAuthorized.class)
     public ResponseEntity<Map<String, String>> notAuthorized(NotAuthorized e) {
         log.warn(e.getMessage());
-        Map<String,String> map = new HashMap<>();
-        map.put("error",e.getMessage());
+        Map<String, String> map = new HashMap<>();
+        map.put("error", e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(map);
+    }
+
+
+    @ExceptionHandler(NotValidUUID.class)
+    public ResponseEntity<Map<String, String>> notValidUUID(NotValidUUID e) {
+        log.warn(e.getMessage());
+        Map<String, String> map = new HashMap<>();
+        map.put("error", "not valid UUID");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
+    }
+
+    @ExceptionHandler(VideoNotFound.class)
+    public ResponseEntity<Map<String, String>> videoNotFound(VideoNotFound e) {
+        log.warn(e.getMessage());
+        Map<String, String> map = new HashMap<>();
+        map.put("error", "video not found");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
+    }
+
+    @ExceptionHandler(SectionNotFound.class)
+    public ResponseEntity<Map<String, String>> sectionNotFound(SectionNotFound e) {
+        log.warn(e.getMessage());
+        Map<String, String> map = new HashMap<>();
+        map.put("error", "section not found");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
     }
 }

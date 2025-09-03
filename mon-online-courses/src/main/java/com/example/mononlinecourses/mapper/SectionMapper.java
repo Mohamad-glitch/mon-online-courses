@@ -12,7 +12,6 @@ public class SectionMapper {
         Section section = new Section();
 
         section.setTitle(createSectionRequest.sectionTitle());
-        section.setPosition(createSectionRequest.sectionPosition());
         section.setCreatedAt(new Date(System.currentTimeMillis()));
         section.setUpdatedAt(new Date(System.currentTimeMillis()));
         return section;

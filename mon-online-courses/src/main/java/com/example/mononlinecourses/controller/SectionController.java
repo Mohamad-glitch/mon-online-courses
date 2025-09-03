@@ -3,12 +3,10 @@ package com.example.mononlinecourses.controller;
 import com.example.mononlinecourses.dto.Requests.CreateSectionRequest;
 import com.example.mononlinecourses.dto.Requests.UpdateSection;
 import com.example.mononlinecourses.dto.responses.ShowCourseSection;
-import com.example.mononlinecourses.model.Section;
-import com.example.mononlinecourses.repository.SectionDao;
 import com.example.mononlinecourses.service.AuthService;
 import com.example.mononlinecourses.service.SectionService;
+import com.example.mononlinecourses.utils.UUIDValidator;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,60 +39,61 @@ public class SectionController {
     public ResponseEntity<Void> createSection(
             @RequestHeader("Authorization") String token,
             @Valid @RequestBody CreateSectionRequest createSectionRequest,
-                                              @PathVariable String courseId) {
+            @PathVariable String courseId) {
 
         isAuthorized(token);
 
-        try {
-            UUID uuid = UUID.fromString(courseId);
+
+        UUID uuid = UUIDValidator.validateUUID(courseId);
 
 
-            sectionService.createSection(createSectionRequest, uuid);
+        sectionService.createSection(createSectionRequest, uuid);
 
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
 
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+
     }
 
 
     @GetMapping("/show-all-sections/{courseId}")
     public ResponseEntity<List<ShowCourseSection>> getAllSectionsFromCourse(@PathVariable String courseId) {
-        try {
-            UUID uuid = UUID.fromString(courseId);
-            List<ShowCourseSection> result = sectionService.getAllSections(uuid);
 
-            return ResponseEntity.status(HttpStatus.OK).body(result);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        UUID uuid = UUIDValidator.validateUUID(courseId);
+        List<ShowCourseSection> result = sectionService.getAllSections(uuid);
+
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+
     }
 
 
-    @PatchMapping("/update-section")
+    @PatchMapping("/update-section/{sectionId}")
     public ResponseEntity<Void> updateSection(
-            @RequestHeader("Authorization")String token,
-            @RequestBody UpdateSection updateSection
+            @RequestHeader("Authorization") String token,
+            @RequestBody UpdateSection updateSection,
+            @PathVariable String sectionId
     ) {
         isAuthorized(token);
 
-        sectionService.updateSection(updateSection, token);
+        UUID sectionUUID = UUIDValidator.validateUUID(sectionId);
+        sectionService.updateSection(updateSection, token, sectionUUID);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping("/delete-section/{section}")
-    public ResponseEntity<Void> deleteSection(@PathVariable("section") String sectionId) {
-        try{
+    public ResponseEntity<Void> deleteSection(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("section") String sectionId
+    ) {
 
-            UUID uuid = UUID.fromString(sectionId);
+        isAuthorized(token);
 
-            sectionService.deleteSectionById(uuid);
-            return ResponseEntity.status(HttpStatus.OK).build();
-        }catch (Exception e){
-            return ResponseEntity.badRequest().build();
-        }
+
+        UUID uuid = UUIDValidator.validateUUID(sectionId);
+
+        sectionService.deleteSectionById(uuid, token);
+        return ResponseEntity.status(HttpStatus.OK).build();
+
     }
 
 }

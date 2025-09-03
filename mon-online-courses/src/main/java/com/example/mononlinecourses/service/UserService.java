@@ -1,7 +1,7 @@
 package com.example.mononlinecourses.service;
 
-import com.example.mononlinecourses.dto.responses.ShowUserResponse;
 import com.example.mononlinecourses.dto.Requests.UpdateUserInfoRequest;
+import com.example.mononlinecourses.dto.responses.ShowUserResponse;
 import com.example.mononlinecourses.enums.Roles;
 import com.example.mononlinecourses.exception.UserExists;
 import com.example.mononlinecourses.mapper.Mapper;
@@ -28,8 +28,8 @@ public class UserService {
 
     @Transactional
     public void createUser(User user) {
-        if(userDao.findUsersByEmail(user.getEmail()).isPresent()) {
-            throw new UserExists("User already exists with this email: "+ user.getEmail());
+        if (userDao.findUsersByEmail(user.getEmail()).isPresent()) {
+            throw new UserExists("User already exists with this email: " + user.getEmail());
         }
         userDao.save(user);
     }
@@ -51,9 +51,9 @@ public class UserService {
         return Mapper.getShowUserDTOFromUser(user);
     }
 
-    public String updateUserRoleFromStudentToInstructor(String email){
+    public String updateUserRoleFromStudentToInstructor(String email) {
         User user = userDao.findUsersByEmail(email).get();
-        if(user.getRole() == Roles.instructor)
+        if (user.getRole() == Roles.instructor)
             return "user is already instructed";
 
         user.setRole(Roles.instructor);
@@ -62,11 +62,11 @@ public class UserService {
         return "user is updated";
     }
 
-    public boolean isUserInstructor(String email){
+    public boolean isUserInstructor(String email) {
         return userDao.existsByEmailAndRole(email, Roles.instructor);
     }
 
-    public UUID getInstructorID(String email){
+    public UUID getInstructorID(String email) {
         return userDao.getUserIdByEmail(email);
     }
 

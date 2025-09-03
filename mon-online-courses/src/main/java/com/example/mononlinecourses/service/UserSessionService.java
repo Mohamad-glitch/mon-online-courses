@@ -44,9 +44,9 @@ public class UserSessionService {
         String email = userSessionDao.getEmailByToken(token);
 
 
-        if(!email.equals(jwtUtils.extractEmail(token))){
+        if (!email.equals(jwtUtils.extractEmail(token))) {
             throw new InvalidCredentials("Invalid credentials");
-        }else if(userSessionDao.getUsedByToken(token)){
+        } else if (userSessionDao.getUsedByToken(token)) {
             throw new UrlHasBeenUsed("url has been used");
         }
 

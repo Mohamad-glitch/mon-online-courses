@@ -33,4 +33,14 @@ public class TestController {
         return "signup-page";
     }
 
+    @GetMapping("/create-video")
+    public String createVideo() {
+        return "create-video";
+    }
+
+    @GetMapping("/show-all")
+    public String showAll() {
+        return "show-all";
+    }
+
 }

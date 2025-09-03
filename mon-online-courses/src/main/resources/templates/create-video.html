@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Video</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f4f6f8;
+        }
+
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            background: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Create Video</h2>
+    <input type="text" id="sectionId" placeholder="Enter Section ID">
+    <input type="text" id="token" placeholder="Enter Authorization Token">
+    <input type="text" id="videoTitle" placeholder="Enter Video Title">
+    <input type="file" id="videoFile" accept="video/*">
+    <button onclick="uploadVideo()">Upload Video</button>
+    <div class="message" id="message"></div>
+</div>
+
+<script>
+    async function uploadVideo() {
+        const sectionId = document.getElementById("sectionId").value.trim();
+        const token = document.getElementById("token").value.trim();
+        const videoTitle = document.getElementById("videoTitle").value.trim();
+        const videoFile = document.getElementById("videoFile").files[0];
+        const messageDiv = document.getElementById("message");
+
+        if (!sectionId || !token || !videoTitle || !videoFile) {
+            messageDiv.innerHTML = "<span style='color:red'>All fields are required!</span>";
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("videoTitle", videoTitle);
+        formData.append("video", videoFile);
+
+        try {
+            const response = await fetch(`/video/create-video/${sectionId}`, {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtc2hsb29sMzhAZ21haWwuY29tIiwicm9sZSI6Imluc3RydWN0b3IiLCJmdWxsTmFtZSI6Im1vaGFtYWQiLCJpYXQiOjE3NTY3NTM4ODEsImV4cCI6MTc1Njc4OTg4MX0.XTPF7MZ_s-t7e7qVmL9n79i6JDW2MnwFMr4V2m70TH8"
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                messageDiv.innerHTML = "<span style='color:green'>Video uploaded successfully!</span>";
+            } else {
+                messageDiv.innerHTML = "<span style='color:red'>Failed to upload video.</span>";
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            messageDiv.innerHTML = "<span style='color:red'>Error uploading video.</span>";
+        }
+    }
+</script>
+</body>
+</html>

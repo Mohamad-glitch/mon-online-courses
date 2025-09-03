@@ -19,4 +19,7 @@ public interface SectionDao extends JpaRepository<Section, UUID> {
     boolean isSectionOwnedByInstructor(@Param("instructorId") UUID instructorId,
                                        @Param("sectionId") UUID sectionId);
 
+
+    @Query("SELECT COALESCE(MAX(s.position), 0) FROM Section s WHERE s.course.id = :courseId")
+    long findMaxPositionByCourseId(@Param("courseId") UUID courseId);
 }

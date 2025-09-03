@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - LearnHub</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f4f6f8; }
+        header { background: #4f46e5; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        header button { background: #fff; color: #4f46e5; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; }
+        header button:hover { background: #e0e7ff; }
+        .home-container { padding: 2rem; max-width: 1200px; margin: auto; }
+        .search-bar { margin-bottom: 1rem; display: flex; }
+        .search-bar input { flex: 1; padding: 0.7rem; border-radius: 5px 0 0 5px; border: 1px solid #ccc; }
+        .search-bar button { padding: 0.7rem 1rem; border: 1px solid #ccc; border-left: none; background: #4f46e5; color: #fff; border-radius: 0 5px 5px 0; cursor: not-allowed; }
+        .courses-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(250px,1fr)); gap: 2rem; }
+        .course-card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: transform 0.2s; cursor: pointer; }
+        .course-card:hover { transform: translateY(-5px); }
+        .course-card img { width: 100%; height: 150px; object-fit: cover; }
+        .course-card .course-info { padding: 1rem; }
+        .course-card h3 { margin: 0 0 0.5rem 0; }
+        .course-card p { font-size: 0.9rem; color: #555; }
+        .expand-container { padding: 0.5rem 1rem; border-top: 1px solid #ddd; background: #f9f9f9; display: none; }
+        .section { padding: 0.5rem; border: 1px solid #ddd; margin-top: 5px; background: #fff; cursor: pointer; }
+        .video { padding: 0.3rem 1rem; color: #333; }
+        .pagination { display: flex; justify-content: center; margin-top: 2rem; gap: 1rem; }
+        .pagination button { padding: 0.5rem 1rem; border-radius: 5px; border: 1px solid #ccc; background: #4f46e5; color: #fff; cursor: pointer; }
+        .pagination button:disabled { background: #ccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>LearnHub</h1>
+    <div id="userActions"></div>
+</header>
+
+<div class="home-container">
+    <div class="search-bar">
+        <input type="text" placeholder="Search courses..." disabled>
+        <button disabled>Search</button>
+    </div>
+    <div class="courses-grid" id="coursesGrid"></div>
+    <div class="pagination">
+        <button id="prevBtn">Previous</button>
+        <span id="pageInfo"></span>
+        <button id="nextBtn">Next</button>
+    </div>
+</div>
+
+<script>
+    const apiBase = "http://localhost:4000";
+    const pageSize = 6;
+    let currentPage = 0;
+    let totalPages = 0;
+    const jwt = localStorage.getItem('jwt');
+
+    const userActions = document.getElementById('userActions');
+    if (jwt) {
+        userActions.innerHTML = `<button id="logoutBtn">Logout</button>`;
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('jwt');
+            location.reload();
+        });
+    } else {
+        userActions.innerHTML = `<button onclick="window.location.href='../login-page'">Login</button>`;
+    }
+
+    async function loadCourses(page = 0) {
+        const grid = document.getElementById('coursesGrid');
+        const pageInfo = document.getElementById('pageInfo');
+        grid.innerHTML = "<p>Loading courses...</p>";
+        try {
+            const res = await fetch(`${apiBase}/courses/show-all-courses?pageNumber=${page}&pageSize=${pageSize}`);
+            const data = await res.json();
+            totalPages = data.totalPages;
+            grid.innerHTML = "";
+            if (data.content.length === 0) {
+                grid.innerHTML = "<p>No courses available</p>";
+                pageInfo.textContent = "";
+                document.getElementById('prevBtn').disabled = true;
+                document.getElementById('nextBtn').disabled = true;
+                return;
+            }
+
+            for (const course of data.content) {
+                const imgRes = await fetch(`${apiBase}/courses/show-course-image/${course.courseId}`);
+                const blob = await imgRes.blob();
+                const imgUrl = URL.createObjectURL(blob);
+
+                const card = document.createElement('div');
+                card.className = 'course-card';
+                card.innerHTML = `
+                    <img src="${imgUrl}" alt="${course.courseTitle}">
+                    <div class="course-info">
+                      <h3>${course.courseTitle}</h3>
+                      <p>${course.courseDescription}</p>
+                      <p><b>Price:</b> $${course.coursePrice}</p>
+                    </div>
+                    <div class="expand-container" id="expand-${course.courseId}"></div>
+                `;
+                card.addEventListener('click', () => toggleSections(course.courseId));
+                grid.appendChild(card);
+            }
+
+            pageInfo.textContent = `Page ${page + 1} of ${totalPages}`;
+            document.getElementById('prevBtn').disabled = page === 0;
+            document.getElementById('nextBtn').disabled = page + 1 >= totalPages;
+
+        } catch (err) {
+            grid.innerHTML = "<p>Error loading courses</p>";
+        }
+    }
+
+    async function toggleSections(courseId) {
+        const container = document.getElementById(`expand-${courseId}`);
+        if (container.style.display === "block") {
+            container.style.display = "none";
+            container.innerHTML = "";
+            return;
+        }
+
+        container.innerHTML = "Loading sections...";
+        container.style.display = "block";
+
+        try {
+            const res = await fetch(`${apiBase}/section/show-all-sections/${courseId}`);
+            const sections = await res.json();
+            container.innerHTML = "";
+
+            if (sections.length === 0) {
+                container.innerHTML = "<p>No sections available</p>";
+                return;
+            }
+
+            sections.forEach(section => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = "section";
+                sectionDiv.textContent = section.sectionTitle;
+                sectionDiv.addEventListener('click', (e) => {
+                    e.stopPropagation(); // prevent closing course
+                    toggleVideos(section.sectionId, sectionDiv);
+                });
+                container.appendChild(sectionDiv);
+            });
+        } catch (err) {
+            container.innerHTML = "<p>Error loading sections</p>";
+        }
+    }
+
+    async function toggleVideos(sectionId, sectionDiv) {
+        let videoContainer = sectionDiv.querySelector(".video-container");
+        if (videoContainer) {
+            videoContainer.remove();
+            return;
+        }
+
+        videoContainer = document.createElement('div');
+        videoContainer.className = "video-container";
+        videoContainer.innerHTML = "Loading videos...";
+        sectionDiv.appendChild(videoContainer);
+
+        try {
+            const res = await fetch(`${apiBase}/video/get-all-content/${sectionId}`);
+            const videos = await res.json();
+            videoContainer.innerHTML = "";
+
+            if (videos.length === 0) {
+                videoContainer.innerHTML = "<p>No videos found</p>";
+                return;
+            }
+
+            videos.forEach(video => {
+                const vid = document.createElement('div');
+                vid.className = "video";
+                vid.textContent = `${video.videoTitle} (${video.videoDurationInSeconds}s)`;
+                videoContainer.appendChild(vid);
+            });
+        } catch (err) {
+            videoContainer.innerHTML = "<p>Error loading videos</p>";
+        }
+    }
+
+    document.getElementById('prevBtn').addEventListener('click', () => {
+        if (currentPage > 0) {
+            currentPage--;
+            loadCourses(currentPage);
+        }
+    });
+    document.getElementById('nextBtn').addEventListener('click', () => {
+        if (currentPage + 1 < totalPages) {
+            currentPage++;
+            loadCourses(currentPage);
+        }
+    });
+
+    loadCourses(currentPage);
+</script>
+</body>
+</html>

@@ -1,8 +1,8 @@
 package com.example.mononlinecourses.controller;
 
 import com.example.mononlinecourses.dto.Requests.RequestToken;
-import com.example.mononlinecourses.dto.responses.ShowUserResponse;
 import com.example.mononlinecourses.dto.Requests.UpdateUserInfoRequest;
+import com.example.mononlinecourses.dto.responses.ShowUserResponse;
 import com.example.mononlinecourses.exception.InvalidCredentials;
 import com.example.mononlinecourses.mapper.Mapper;
 import com.example.mononlinecourses.service.AuthService;
